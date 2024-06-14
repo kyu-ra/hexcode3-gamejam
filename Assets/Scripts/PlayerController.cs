@@ -32,6 +32,7 @@ public class PlayerController : MonoBehaviour
     {
         chainDir = value.Get<Vector2>();
 
+        //Right now it is impossible to create a second chain due to controls setup, except in cases where two chains are triggered on the same frame
         if (curChains < maxChains)
         {           
             float rotation = Mathf.Atan2(chainDir.y, chainDir.x) * Mathf.Rad2Deg;

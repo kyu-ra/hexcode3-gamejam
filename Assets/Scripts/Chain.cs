@@ -14,18 +14,12 @@ public class Chain : MonoBehaviour
     public float chainSpeed;
     // How many additional chain segments do we have active now?
     private int chainSegments = 0;
-
-    public GameObject link1;
-    public GameObject link2;
-    public GameObject link3;
-    public GameObject link4;
-    public GameObject link5;
-    public GameObject link6;
-    public GameObject link7;
-    public GameObject link8;
-    public GameObject link9;
-    public GameObject link10;
-
+    // Link prefab
+    public GameObject link;
+    // Maximum links after the base link
+    public int linkMax;
+    // Transform position offset so links line up properly
+    public float linkOffset;
     private GameObject[] chainSegmentArray;
 
     // Start is called before the first frame update
@@ -35,7 +29,23 @@ public class Chain : MonoBehaviour
         player.curChains++;
 
         startTime = Time.time;
-        chainSegmentArray = new GameObject[] { link1, link2, link3, link4, link5, link6, link7, link8, link9, link10 };
+        chainSegmentArray = new GameObject[linkMax];
+
+        float chainOriginRotation = Mathf.Atan2(player.chainDir.y, player.chainDir.x) * Mathf.Rad2Deg;
+
+        for (int i = 0; i < linkMax; i++)
+        {
+            float curLinkOffset = (linkOffset * (i + 1)) + player.offset;
+            Debug.Log(this.transform.eulerAngles);
+            float posX = Mathf.Cos(chainOriginRotation) * curLinkOffset;
+            float posY = Mathf.Sin(chainOriginRotation) * curLinkOffset;
+            Debug.Log(posX + ", " + posY);
+            Vector3 position = new Vector3(posX, posY, 0);
+            
+            chainSegmentArray[i] = Instantiate(link, new Vector3(player.chainDir.x * curLinkOffset, player.chainDir.y * curLinkOffset, 0), 
+                this.transform.rotation, transform);
+           
+        }
     }
 
     // Update is called once per frame
@@ -49,11 +59,9 @@ public class Chain : MonoBehaviour
         }
 
         // Update rotation and offset
-        float rotation = Mathf.Atan2(player.chainDir.y, player.chainDir.x) * Mathf.Rad2Deg;
-        float offsetX = player.chainDir.x * player.offset;
-        float offsetY = player.chainDir.y * player.offset;
-        this.transform.rotation = Quaternion.Euler(0,0,rotation);
-        this.transform.localPosition = new Vector3(offsetX, offsetY, 0);
+        float chainOriginRotation = Mathf.Atan2(player.chainDir.y, player.chainDir.x) * Mathf.Rad2Deg;
+        this.transform.rotation = Quaternion.Euler(0,0,chainOriginRotation);
+        this.transform.localPosition = new Vector3(player.chainDir.x * player.offset, player.chainDir.y * player.offset, 0);
 
         // Update chain length
         // How many chain segments are we allowed to have active, by time?
